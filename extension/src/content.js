@@ -27,17 +27,13 @@ function detectPlatform() {
 // ─── Socket Connection ─────────────────────────────────────────────────────────
 
 function connectSocket(serverUrl) {
-  // Dynamically inject Socket.io client
-  if (window.__wtSocket) {
-    window.__wtSocket.disconnect();
+  if (socket) {
+    socket.disconnect();
+    socket = null;
   }
 
-  const script = document.createElement('script');
-  script.src = `${serverUrl}/socket.io/socket.io.js`;
-  script.onload = () => {
-    const io = window.io;
-    const s = io(serverUrl, { transports: ['websocket'] });
-    window.__wtSocket = s;
+  {
+    const s = io(serverUrl, { transports: ['websocket', 'polling'] });
 
     s.on('connect', () => {
       s.emit('join', { roomCode, username, avatar, platform: detectPlatform() });
@@ -109,15 +105,9 @@ function connectSocket(serverUrl) {
       }
     });
 
-    // Chat notification
-    s.on('chat', () => {
-      playNotificationSound();
-    });
-
     socket = s;
     attachVideoListeners();
-  };
-  document.head.appendChild(script);
+  }
 }
 
 function attachVideoListeners() {

@@ -14,7 +14,14 @@
     "https://www.amazon.com/*",
     "https://www.primevideo.com/*",
     "https://www.youtube.com/*",
-    "https://www.disneyplus.com/*"
+    "https://www.disneyplus.com/*",
+    "https://www.max.com/*",
+    "https://play.max.com/*",
+    "https://www.hbomax.com/*",
+    "https://www.paramount.com/*",
+    "https://www.paramountplus.com/*",
+    "https://www.crunchyroll.com/*",
+    "https://tv.apple.com/*"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -31,9 +38,17 @@
         "https://www.amazon.com/*",
         "https://www.primevideo.com/*",
         "https://www.youtube.com/*",
-        "https://www.disneyplus.com/*"
+        "https://www.disneyplus.com/*",
+        "https://www.max.com/*",
+        "https://play.max.com/*",
+        "https://www.hbomax.com/*",
+        "https://www.paramount.com/*",
+        "https://www.paramountplus.com/*",
+        "https://www.crunchyroll.com/*",
+        "https://www.apple.com/apple-tv-plus/*",
+        "https://tv.apple.com/*"
       ],
-      "js": ["src/content.js"],
+      "js": ["src/socket.io.min.js", "src/content.js"],
       "css": ["src/sidebar.css"],
       "run_at": "document_idle"
     }
