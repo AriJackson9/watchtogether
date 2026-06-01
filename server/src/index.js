@@ -134,6 +134,20 @@ io.on('connection', (socket) => {
       text: `${avatar || '👤'} ${username} joined`,
       timestamp: Date.now()
     });
+
+    // WebRTC: send existing peer socket IDs to the new user
+    const existingPeers = Array.from(room.users.entries())
+      .filter(([sid]) => sid !== socket.id)
+      .map(([sid, u]) => ({ socketId: sid, username: u.name }));
+    socket.emit('webrtc_peers', existingPeers);
+
+    // Tell existing users about the new user (so they can initiate WebRTC)
+    socket.to(roomCode).emit('user_joined_webrtc', { socketId: socket.id, username });
+  });
+
+  // WebRTC signaling relay
+  socket.on('webrtc_signal', ({ to, signal }) => {
+    io.to(to).emit('webrtc_signal', { signal, from: socket.id });
   });
 
   // Play event

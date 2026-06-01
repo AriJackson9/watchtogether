@@ -275,6 +275,42 @@
     }
     .send-btn:active { transform: scale(0.9); }
 
+    /* ── MIC BUTTON ── */
+    #mic-btn {
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 20px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.1s, background 0.2s;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    #mic-btn:active { transform: scale(0.9); }
+    #mic-btn.active {
+      background: #dc2626;
+      border-color: #dc2626;
+      box-shadow: 0 0 0 4px rgba(220,38,38,0.25);
+      animation: micPulse 1.5s infinite;
+    }
+    @keyframes micPulse {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(220,38,38,0.25); }
+      50%       { box-shadow: 0 0 0 8px rgba(220,38,38,0.1); }
+    }
+    #mic-status {
+      font-size: 10px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: -4px;
+    }
+    #mic-status.active { color: #f87171; }
+
     .hidden { display: none !important; }
   </style>
 </head>
@@ -340,6 +376,10 @@
       <button class="reaction-btn" data-emoji="😭">😭</button>
     </div>
     <div class="chat-row">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px">
+        <button id="mic-btn" title="Mikrofon">🎤</button>
+        <span id="mic-status">Stumm</span>
+      </div>
       <input type="text" id="chat-input" placeholder="Nachricht..." maxlength="200" autocomplete="off">
       <button class="send-btn" id="send-btn">➤</button>
     </div>
@@ -434,6 +474,8 @@
       });
     });
 
+    setupWebRTCListeners();
+
     socket.on('room_users', ({ users }) => updateParticipants(users));
 
     socket.on('chat', (msg) => addMessage(msg));
@@ -499,6 +541,8 @@
 
   // Leave button
   $('leave-btn').addEventListener('click', () => {
+    closeAllPeers();
+    roomPeers.clear();
     if (socket) socket.disconnect();
     $('room-screen').style.display = 'none';
     $('join-screen').style.display = 'flex';
@@ -534,6 +578,150 @@
   $('join-code').addEventListener('input', e => {
     e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
   });
+
+  // ── WebRTC ──────────────────────────────────────────────────
+  const ICE_CONFIG = { iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' }
+  ]};
+
+  let localStream = null;
+  let micEnabled = false;
+  const peers = new Map(); // socketId -> RTCPeerConnection
+  const remoteAudios = new Map(); // socketId -> <audio>
+
+  function setMicUI(on) {
+    $('mic-btn').classList.toggle('active', on);
+    $('mic-btn').textContent = on ? '🔴' : '🎤';
+    $('mic-status').textContent = on ? 'An' : 'Stumm';
+    $('mic-status').classList.toggle('active', on);
+  }
+
+  async function getLocalStream() {
+    if (localStream) return localStream;
+    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    return localStream;
+  }
+
+  async function createPeer(targetId, initiator) {
+    if (peers.has(targetId)) return;
+    const pc = new RTCPeerConnection(ICE_CONFIG);
+    peers.set(targetId, pc);
+
+    // Add local audio
+    if (localStream) {
+      localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
+    }
+
+    // Play remote audio
+    pc.ontrack = (e) => {
+      let audio = remoteAudios.get(targetId);
+      if (!audio) {
+        audio = new Audio();
+        audio.autoplay = true;
+        remoteAudios.set(targetId, audio);
+      }
+      audio.srcObject = e.streams[0];
+    };
+
+    // ICE
+    pc.onicecandidate = (e) => {
+      if (e.candidate && socket) {
+        socket.emit('webrtc_signal', { to: targetId, signal: { type: 'ice', candidate: e.candidate } });
+      }
+    };
+
+    pc.onconnectionstatechange = () => {
+      if (pc.connectionState === 'failed' || pc.connectionState === 'closed') {
+        peers.delete(targetId);
+      }
+    };
+
+    if (initiator) {
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      socket.emit('webrtc_signal', { to: targetId, signal: { type: 'offer', sdp: pc.localDescription } });
+    }
+
+    return pc;
+  }
+
+  async function handleSignal({ signal, from }) {
+    if (signal.type === 'offer') {
+      await createPeer(from, false);
+      const pc = peers.get(from);
+      await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      socket.emit('webrtc_signal', { to: from, signal: { type: 'answer', sdp: pc.localDescription } });
+    } else if (signal.type === 'answer') {
+      const pc = peers.get(from);
+      if (pc) await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+    } else if (signal.type === 'ice') {
+      const pc = peers.get(from);
+      if (pc && pc.remoteDescription) {
+        await pc.addIceCandidate(new RTCIceCandidate(signal.candidate)).catch(() => {});
+      }
+    }
+  }
+
+  function closePeer(socketId) {
+    const pc = peers.get(socketId);
+    if (pc) { pc.close(); peers.delete(socketId); }
+    const audio = remoteAudios.get(socketId);
+    if (audio) { audio.srcObject = null; remoteAudios.delete(socketId); }
+  }
+
+  function closeAllPeers() {
+    for (const [id] of peers) closePeer(id);
+    if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; }
+    micEnabled = false;
+    setMicUI(false);
+  }
+
+  // Mic toggle button
+  $('mic-btn').addEventListener('click', async () => {
+    if (!socket) return;
+    if (!micEnabled) {
+      try {
+        await getLocalStream();
+        micEnabled = true;
+        setMicUI(true);
+        // Connect to all existing peers in the room
+        for (const [socketId] of roomPeers) {
+          await createPeer(socketId, true);
+        }
+      } catch {
+        alert('Mikrofon-Zugriff verweigert. Bitte in den Browser-Einstellungen erlauben.');
+      }
+    } else {
+      micEnabled = false;
+      if (localStream) localStream.getAudioTracks().forEach(t => t.enabled = false);
+      setMicUI(false);
+      // Close all peer connections
+      for (const [id] of peers) closePeer(id);
+    }
+  });
+
+  // Track peers in the room for WebRTC
+  const roomPeers = new Map(); // socketId -> username
+
+  function setupWebRTCListeners() {
+    socket.on('webrtc_peers', (peerList) => {
+      peerList.forEach(p => roomPeers.set(p.socketId, p.username));
+      if (micEnabled) {
+        peerList.forEach(p => createPeer(p.socketId, true));
+      }
+    });
+
+    socket.on('user_joined_webrtc', ({ socketId, username }) => {
+      roomPeers.set(socketId, username);
+      if (micEnabled) createPeer(socketId, true);
+    });
+
+    socket.on('webrtc_signal', handleSignal);
+  }
+  // ── End WebRTC ───────────────────────────────────────────────
 
   // Restore saved name
   const saved = localStorage.getItem('wt_name');
