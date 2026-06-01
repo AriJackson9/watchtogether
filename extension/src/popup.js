@@ -1,5 +1,5 @@
 // popup.js
-const SERVER_URL = 'https://habbix.de'; // Production server
+const SERVER_URL = 'https://watchtogether-production-0aa2.up.railway.app';
 
 const $ = id => document.getElementById(id);
 
