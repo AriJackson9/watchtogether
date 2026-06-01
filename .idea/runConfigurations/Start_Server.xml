@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Start Server" type="NodeJSConfigurationType" factoryName="Node.js">
+    <option name="WORKING_DIR" value="$PROJECT_DIR$/server" />
+    <option name="SCRIPT_PATH" value="$PROJECT_DIR$/server/src/index.js" />
+    <method v="2" />
+  </configuration>
+</component>

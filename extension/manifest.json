@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "WatchTogether",
+  "version": "1.0.0",
+  "description": "Watch movies together in sync with chat",
+  "permissions": [
+    "storage",
+    "tabs",
+    "activeTab",
+    "scripting"
+  ],
+  "host_permissions": [
+    "https://www.netflix.com/*",
+    "https://www.amazon.com/*",
+    "https://www.primevideo.com/*",
+    "https://www.youtube.com/*",
+    "https://www.disneyplus.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.netflix.com/*",
+        "https://www.amazon.com/*",
+        "https://www.primevideo.com/*",
+        "https://www.youtube.com/*",
+        "https://www.disneyplus.com/*"
+      ],
+      "js": ["src/content.js"],
+      "css": ["src/sidebar.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

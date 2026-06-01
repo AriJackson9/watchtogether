@@ -1,0 +1,320 @@
+/* sidebar.css - injected into streaming pages */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap');
+
+#wt-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  width: 300px !important;
+  height: 100vh !important;
+  background: rgba(8, 8, 15, 0.97) !important;
+  backdrop-filter: blur(20px) !important;
+  border-left: 1px solid rgba(192, 132, 252, 0.2) !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 13px !important;
+  color: #f0f0f8 !important;
+  transform: translateX(0) !important;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: -10px 0 40px rgba(0,0,0,0.5) !important;
+  overflow: hidden !important;
+}
+
+#wt-tab {
+  position: fixed !important;
+  top: 50% !important;
+  right: 0 !important;
+  transform: translateY(-50%) !important;
+  z-index: 2147483646 !important;
+  background: rgba(192, 132, 252, 0.9) !important;
+  color: white !important;
+  padding: 12px 8px !important;
+  border-radius: 8px 0 0 8px !important;
+  cursor: pointer !important;
+  font-size: 18px !important;
+  line-height: 1 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.3s, background 0.2s !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+#wt-tab:hover {
+  background: rgba(192, 132, 252, 1) !important;
+}
+
+/* Header */
+.wt-header {
+  padding: 14px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+  background: linear-gradient(135deg, rgba(26,10,46,0.8), rgba(10,10,26,0.8)) !important;
+  flex-shrink: 0 !important;
+}
+
+.wt-title {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  background: linear-gradient(90deg, #c084fc, #818cf8) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  letter-spacing: -0.2px !important;
+}
+
+.wt-btn-icon {
+  background: rgba(255,255,255,0.08) !important;
+  border: none !important;
+  color: #9ca3af !important;
+  width: 28px !important; height: 28px !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  transition: all 0.2s !important;
+}
+
+.wt-btn-icon:hover {
+  background: rgba(255,255,255,0.15) !important;
+  color: white !important;
+}
+
+/* Room badge */
+.wt-room-badge {
+  padding: 10px 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+  flex-shrink: 0 !important;
+}
+
+.wt-badge-label {
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  color: #6b6b8a !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+
+.wt-badge-code {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  letter-spacing: 3px !important;
+  color: #c084fc !important;
+}
+
+/* Participants */
+.wt-participants {
+  display: flex !important;
+  gap: 8px !important;
+  padding: 10px 16px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+  flex-shrink: 0 !important;
+  flex-wrap: wrap !important;
+}
+
+.wt-participant {
+  width: 32px !important; height: 32px !important;
+  border-radius: 50% !important;
+  background: rgba(192, 132, 252, 0.15) !important;
+  border: 1.5px solid rgba(192, 132, 252, 0.4) !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  font-size: 16px !important;
+}
+
+/* Sync bar */
+.wt-sync-bar {
+  padding: 8px 16px !important;
+  background: rgba(255,255,255,0.03) !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+  font-size: 11px !important;
+  color: #6b6b8a !important;
+  flex-shrink: 0 !important;
+}
+
+/* Reactions */
+.wt-reactions-bar {
+  display: flex !important;
+  gap: 4px !important;
+  padding: 8px 12px !important;
+  border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+  flex-shrink: 0 !important;
+}
+
+.wt-reaction-btn {
+  flex: 1 !important;
+  background: rgba(255,255,255,0.05) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  border-radius: 8px !important;
+  padding: 6px 4px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  transition: all 0.15s !important;
+  line-height: 1 !important;
+}
+
+.wt-reaction-btn:hover {
+  background: rgba(255,255,255,0.12) !important;
+  transform: scale(1.15) !important;
+}
+
+.wt-reaction-btn:active {
+  transform: scale(0.95) !important;
+}
+
+/* Chat */
+.wt-chat {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+.wt-messages {
+  flex: 1 !important;
+  overflow-y: auto !important;
+  padding: 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(255,255,255,0.1) transparent !important;
+}
+
+.wt-msg {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: flex-end !important;
+  max-width: 85% !important;
+}
+
+.wt-msg-self {
+  align-self: flex-end !important;
+  flex-direction: row-reverse !important;
+}
+
+.wt-msg-other {
+  align-self: flex-start !important;
+}
+
+.wt-msg-avatar {
+  width: 26px !important; height: 26px !important;
+  border-radius: 50% !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  font-size: 14px !important;
+  background: rgba(192,132,252,0.15) !important;
+  flex-shrink: 0 !important;
+}
+
+.wt-msg-bubble {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+}
+
+.wt-msg-name {
+  font-size: 10px !important;
+  color: #6b6b8a !important;
+  padding-left: 2px !important;
+}
+
+.wt-msg-text {
+  padding: 7px 11px !important;
+  border-radius: 14px !important;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+  word-break: break-word !important;
+}
+
+.wt-msg-other .wt-msg-text {
+  background: rgba(255,255,255,0.08) !important;
+  border-radius: 4px 14px 14px 14px !important;
+}
+
+.wt-msg-self .wt-msg-text {
+  background: linear-gradient(135deg, rgba(192,132,252,0.4), rgba(129,140,248,0.4)) !important;
+  border: 1px solid rgba(192,132,252,0.3) !important;
+  border-radius: 14px 4px 14px 14px !important;
+}
+
+.wt-msg-system {
+  align-self: center !important;
+  font-size: 11px !important;
+  color: #4b4b6a !important;
+  padding: 3px 10px !important;
+  background: rgba(255,255,255,0.03) !important;
+  border-radius: 20px !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+}
+
+/* Input row */
+.wt-input-row {
+  display: flex !important;
+  gap: 8px !important;
+  padding: 10px 12px !important;
+  border-top: 1px solid rgba(255,255,255,0.06) !important;
+  flex-shrink: 0 !important;
+}
+
+.wt-input {
+  flex: 1 !important;
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  border-radius: 20px !important;
+  padding: 8px 14px !important;
+  color: #f0f0f8 !important;
+  font-family: 'DM Sans', sans-serif !important;
+  font-size: 13px !important;
+  outline: none !important;
+  transition: border-color 0.2s !important;
+}
+
+.wt-input:focus {
+  border-color: rgba(192,132,252,0.5) !important;
+}
+
+.wt-input::placeholder { color: #4b4b6a !important; }
+
+.wt-send-btn {
+  width: 34px !important; height: 34px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, #c084fc, #818cf8) !important;
+  border: none !important;
+  color: white !important;
+  font-size: 16px !important;
+  cursor: pointer !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  transition: opacity 0.2s !important;
+  flex-shrink: 0 !important;
+}
+
+.wt-send-btn:hover { opacity: 0.85 !important; }
+
+/* Floating reactions */
+.wt-floating-reactions {
+  position: fixed !important;
+  bottom: 80px !important;
+  right: 310px !important;
+  width: 60px !important;
+  height: 200px !important;
+  pointer-events: none !important;
+  z-index: 2147483645 !important;
+}
+
+.wt-float-emoji {
+  position: absolute !important;
+  bottom: 0 !important;
+  font-size: 28px !important;
+  animation: wt-float-up 2.5s ease-out forwards !important;
+}
+
+@keyframes wt-float-up {
+  0%   { transform: translateY(0) scale(0.5); opacity: 0; }
+  15%  { opacity: 1; transform: translateY(-10px) scale(1.1); }
+  100% { transform: translateY(-160px) scale(0.8); opacity: 0; }
+}

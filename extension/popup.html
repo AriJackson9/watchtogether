@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WatchTogether</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface2: #1c1c28;
+      --border: #2a2a3d;
+      --accent: #c084fc;
+      --accent2: #818cf8;
+      --text: #f0f0f8;
+      --muted: #6b6b8a;
+      --red: #f87171;
+      --green: #4ade80;
+    }
+
+    body {
+      width: 320px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, #1a0a2e 0%, #0a0a1a 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 100px; height: 100px;
+      background: radial-gradient(circle, rgba(192,132,252,0.15) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 32px; height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+
+    .logo-text {
+      font-family: 'DM Serif Display', serif;
+      font-size: 18px;
+      letter-spacing: -0.3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .status-bar {
+      padding: 10px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .status-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .status-dot.connected { background: var(--green); box-shadow: 0 0 6px rgba(74,222,128,0.5); }
+    .status-dot.in-room { background: var(--accent); box-shadow: 0 0 6px rgba(192,132,252,0.5); }
+
+    .content {
+      padding: 20px;
+    }
+
+    /* Setup Screen */
+    #setup-screen { display: flex; flex-direction: column; gap: 14px; }
+
+    .field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus {
+      border-color: var(--accent);
+    }
+
+    .field input::placeholder { color: var(--muted); }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.2px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+    }
+
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-danger {
+      background: rgba(248,113,113,0.1);
+      color: var(--red);
+      border: 1px solid rgba(248,113,113,0.2);
+    }
+
+    .btn-danger:hover { background: rgba(248,113,113,0.2); }
+
+    /* Room Screen */
+    #room-screen { display: none; flex-direction: column; gap: 14px; }
+
+    .room-info {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .room-info-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+
+    .room-code-display {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      letter-spacing: 4px;
+      color: var(--accent);
+      text-align: center;
+      padding: 8px 0;
+    }
+
+    .copy-hint {
+      font-size: 11px;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    .participants {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .participant-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 12px;
+    }
+
+    .participant-avatar {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+    }
+
+    .sync-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--surface2);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .sync-icon { font-size: 16px; }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+    }
+
+    .toggle-label {
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .toggle {
+      position: relative;
+      width: 38px; height: 22px;
+    }
+
+    .toggle input { opacity: 0; width: 0; height: 0; }
+
+    .toggle-slider {
+      position: absolute;
+      inset: 0;
+      background: var(--border);
+      border-radius: 22px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .toggle-slider::before {
+      content: '';
+      position: absolute;
+      left: 3px; top: 3px;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: white;
+      transition: 0.3s;
+    }
+
+    .toggle input:checked + .toggle-slider { background: var(--accent); }
+    .toggle input:checked + .toggle-slider::before { transform: translateX(16px); }
+
+    .error-msg {
+      font-size: 12px;
+      color: var(--red);
+      text-align: center;
+      min-height: 16px;
+    }
+
+    .loading {
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 12px; height: 12px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .not-supported {
+      text-align: center;
+      padding: 20px 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .not-supported .icon { font-size: 32px; margin-bottom: 10px; }
+
+    .supported-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 12px;
+    }
+
+    .supported-chip {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">🎬</div>
+      <div>
+        <div class="logo-text">WatchTogether</div>
+        <div class="logo-sub">Sync. Watch. Vibe.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="status-bar">
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text">Checking page...</span>
+  </div>
+
+  <div class="content">
+    <!-- Not supported page -->
+    <div id="not-supported" style="display:none">
+      <div class="not-supported">
+        <div class="icon">📺</div>
+        <div>Open a video on a supported platform first</div>
+        <div class="supported-list">
+          <span class="supported-chip">Netflix</span>
+          <span class="supported-chip">Prime Video</span>
+          <span class="supported-chip">YouTube</span>
+          <span class="supported-chip">Disney+</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Setup screen -->
+    <div id="setup-screen">
+      <div class="field">
+        <label>Your Name</label>
+        <input type="text" id="username" placeholder="e.g. Niti" maxlength="20" />
+      </div>
+
+      <div class="field">
+        <label>Emoji Avatar</label>
+        <input type="text" id="avatar" placeholder="Pick an emoji 🎬" maxlength="2" />
+      </div>
+
+      <button class="btn btn-primary" id="create-btn">
+        ✨ Create Room
+      </button>
+
+      <div class="divider">or join existing</div>
+
+      <div class="field">
+        <label>Room Code</label>
+        <input type="text" id="join-code" placeholder="Enter 6-digit code" maxlength="6" style="text-transform:uppercase; letter-spacing:3px; text-align:center;" />
+      </div>
+
+      <button class="btn btn-secondary" id="join-btn">
+        → Join Room
+      </button>
+
+      <div class="error-msg" id="error-msg"></div>
+    </div>
+
+    <!-- Room screen -->
+    <div id="room-screen">
+      <div class="room-info">
+        <div class="room-info-label">Room Code — share this</div>
+        <div class="room-code-display" id="room-code-display">------</div>
+        <div class="copy-hint" id="copy-hint">Click to copy</div>
+      </div>
+
+      <div class="room-info">
+        <div class="room-info-label">In this room</div>
+        <div class="participants" id="participants-list"></div>
+      </div>
+
+      <div class="sync-status" id="sync-status">
+        <span class="sync-icon">🔄</span>
+        <span id="sync-status-text">Waiting for video...</span>
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">💬 Show Chat</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-chat" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">🔔 Sound notifications</span>
+        <label class="toggle">
+          <input type="checkbox" id="toggle-sounds" checked />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+
+      <button class="btn btn-danger" id="leave-btn">
+        Leave Room
+      </button>
+    </div>
+  </div>
+
+  <script src="src/popup.js"></script>
+</body>
+</html>
